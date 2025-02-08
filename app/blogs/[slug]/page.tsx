@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
@@ -484,119 +484,166 @@ const blogPosts = [
   }
 ];
 
-export default function BlogPostPage() {
-  const [visiblePosts, setVisiblePosts] = useState(10);
+export default function BlogPostPage({ params }: { params: { slug: string } }) {
+  // Find the current blog post based on the slug
+  const currentPost = blogPosts.find(post => post.slug === params.slug);
 
-  const loadMorePosts = () => {
-    // If we've reached the end, reset to initial state or start from beginning
-    if (visiblePosts >= blogPosts.length) {
-      setVisiblePosts(10);
-    } else {
-      // Otherwise, load more posts
-      setVisiblePosts(prevVisible => Math.min(prevVisible + 5, blogPosts.length));
-    }
-  };
+  // If no post is found, show a 404-like message
+  if (!currentPost) {
+    return (
+      <div className="bg-gray-900 min-h-screen flex items-center justify-center text-white">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Blog Post Not Found</h1>
+          <p className="text-xl text-gray-400 mb-6">The blog you are looking for does not exist.</p>
+          <Link 
+            href="/blogs" 
+            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Back to Blogs
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-900 min-h-screen">
+    <div className="bg-gray-900 min-h-screen relative">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[250px]">
-          {blogPosts.slice(0, visiblePosts).map((post, index) => (
-            <div 
-              key={post.slug}
-              className={`
-                bg-white shadow-lg rounded-xl overflow-hidden 
-                transition-all duration-300 hover:scale-105 hover:shadow-xl
-                flex flex-col
-                ${index === 0 ? 'md:col-span-2 md:row-span-2' : 
-                  index === 1 ? 'md:col-span-2' : 
-                  'md:col-span-1'}
-              `}
-            >
-              <div className="relative h-full">
-                {/* Blog Post Image */}
+      
+      {/* Blog Post Hero Section */}
+      <div className="relative w-full h-[600px] overflow-hidden group">
+        <Image 
+          src={currentPost.image} 
+          alt={currentPost.title}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="absolute inset-0 object-cover w-full h-full 
+            transition-transform duration-500 
+            group-hover:scale-105 
+            brightness-75 group-hover:brightness-100"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+          <div className="container mx-auto px-4 py-12 text-white">
+            <div className="max-w-4xl">
+              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm mb-4 inline-block">
+                {currentPost.category}
+              </span>
+              <h1 className="text-4xl font-bold mb-4">{currentPost.title}</h1>
+              <div className="flex items-center space-x-4">
                 <Image 
-                  src={post.image} 
-                  alt={post.title}
-                  fill
-                  className="absolute inset-0 object-cover w-full h-full"
+                  src={currentPost.authorImage} 
+                  alt={currentPost.author}
+                  width={48}
+                  height={48}
+                  className="rounded-full border-2 border-white"
                 />
-                
-                {/* Overlay Content */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent 
-                  flex flex-col justify-end p-4 text-white">
-                  <div className="space-y-2">
-                    <h2 className="text-lg font-bold line-clamp-2 mb-2">
-                      {post.title}
-                    </h2>
-                    <p className="text-sm text-gray-300 line-clamp-2 mb-2">
-                      {post.description}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <Image 
-                        src={post.authorImage} 
-                        alt={post.author} 
-                        width={32} 
-                        height={32} 
-                        className="rounded-full"
-                      />
-                      <div>
-                        <p className="text-sm font-medium">{post.author}</p>
-                        <div className="flex items-center space-x-2 text-xs text-gray-400">
-                          <span>{post.date}</span>
-                          <span>•</span>
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {post.tags.map((tag) => (
-                        <span 
-                          key={tag}
-                          className="bg-white/20 text-white px-2 py-1 rounded-full text-xs"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                <div>
+                  <p className="font-semibold">{currentPost.author}</p>
+                  <p className="text-sm text-gray-300">
+                    {currentPost.date} • {currentPost.readTime}
+                  </p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Blog Content */}
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <article className="prose prose-invert">
+          {currentPost.content.map((section, index) => {
+            switch (section.type) {
+              case 'paragraph':
+                return (
+                  <div key={index} className="mb-6 relative">
+                    <p>{section.text}</p>
+                    {section.image && (
+                      <div className="my-6 w-full h-[400px] relative">
+                        <Image 
+                          src={section.image} 
+                          alt={`Illustration for ${currentPost.title}`}
+                          fill
+                          className="object-cover rounded-xl shadow-lg"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              case 'heading':
+                return <h2 key={index} className="text-2xl font-bold mt-8 mb-4">{section.text}</h2>;
+              case 'list':
+                return (
+                  <div key={index} className="mb-6">
+                    <h3 className="text-xl font-semibold mb-3">{section.title}</h3>
+                    <ul className="list-disc list-inside space-y-2">
+                      {section.items.map((item, itemIndex) => (
+                        <li key={itemIndex}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })}
+        </article>
+
+        {/* Tags */}
+        <div className="mt-8 flex flex-wrap gap-2">
+          {currentPost.tags.map((tag) => (
+            <span 
+              key={tag}
+              className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm"
+            >
+              #{tag}
+            </span>
           ))}
         </div>
+      </div>
 
-        {/* Load More Button */}
-        <div className="flex justify-center mt-8">
-          <button 
-            onClick={loadMorePosts}
-            className="
-              bg-blue-600 text-white 
-              px-6 py-3 rounded-full 
-              hover:bg-blue-700 
-              transition-colors duration-300
-              flex items-center space-x-2
-            "
-          >
-            <span>
-              {visiblePosts >= blogPosts.length 
-                ? 'Back to Top' 
-                : 'Load More Blogs'}
-            </span>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5" 
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-            >
-              <path 
-                fillRule="evenodd" 
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3H6a1 1 0 100 2h3v3a1 1 0 102 0v-3h3a1 1 0 100-2h-3V7z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-          </button>
+      {/* Related Blog Posts */}
+      <div className="container mx-auto px-4 py-12">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">
+          Related Blog Posts
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {blogPosts
+            .filter(post => post.slug !== currentPost.slug)
+            .slice(0, 3)
+            .map((post) => (
+              <Link 
+                key={post.slug} 
+                href={`/blogs/${post.slug}`}
+                className="bg-gray-800 rounded-xl overflow-hidden 
+                  transform transition-all duration-300 
+                  hover:scale-105 hover:shadow-2xl 
+                  group"
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <Image 
+                    src={post.image} 
+                    alt={post.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover 
+                      transition-transform duration-500 
+                      group-hover:scale-110 
+                      brightness-75 group-hover:brightness-100"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm line-clamp-2">
+                    {post.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
         </div>
       </div>
     </div>
