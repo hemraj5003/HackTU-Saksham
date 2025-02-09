@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="dragonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A4B84;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00B4B4;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <filter id="shadowEffect">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Dragon Silhouette with Cybersecurity Elements -->
+  <g transform="translate(50, 30) scale(0.7)" filter="url(#shadowEffect)">
+    <!-- Dragon Body -->
+    <path 
+      d="M50,20 
+         Q70,10 90,20 
+         Q110,30 100,50 
+         Q90,70 80,80 
+         Q60,90 50,100 
+         Q40,110 50,120 
+         Q60,130 70,140 
+         Q80,150 70,160 
+         Q60,170 50,160" 
+      fill="url(#dragonGradient)" 
+      stroke="#FFFFFF" 
+      stroke-width="3"
+    />
+    
+    <!-- Cybersecurity Elements -->
+    <g transform="translate(30, 50) rotate(45)" fill="none" stroke="#FFFFFF" stroke-width="2">
+      <!-- Binary Code Overlay -->
+      <text x="0" y="0" font-size="8" fill="#FFFFFF" opacity="0.5">
+        01010011 01100101 01100011 01110101 01110010 01101001 01110100 01111001
+      </text>
+      
+      <!-- Circuit-like Patterns -->
+      <path 
+        d="M0,0 L10,0 M5,0 L5,10 M0,5 L10,5" 
+        stroke="#FFFFFF" 
+        stroke-dasharray="2,2"
+        opacity="0.7"
+      />
+    </g>
+    
+    <!-- Sharp, Protective Edges -->
+    <path 
+      d="M90,50 L100,40 L110,50 Z" 
+      fill="#FFFFFF" 
+      opacity="0.5"
+    />
+  </g>
+  
+  <!-- Protective Shield Overlay -->
+  <path 
+    d="M100,160 L130,140 L170,160 L170,190 L100,190 Z" 
+    fill="rgba(255,255,255,0.1)" 
+    stroke="#FFFFFF" 
+    stroke-width="2"
+  />
+</svg>
