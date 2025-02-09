@@ -89,7 +89,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 For any inquiries, feel free to open an issue or reach out via GitHub.
 
 ---
-**Learning Tokens**
+#Learning Tokens
+
 SakshamSecurity is a Solidity smart contract for secure user registration, public key updates, and token rewards. Users register with hashed public keys and earn tokens upon completing learning tracks. The contract ensures transparency through event logging and allows users to verify their registration status. Functions include registering, updating keys, verifying users, and checking balances. This project is licensed under the MIT License.
 
 
